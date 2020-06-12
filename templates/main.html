@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>港约,寻找志同道合</title>
+    <link rel="icon" type="image/gif" href="../static/img/xjtu.gif" />
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="../static/js/jquery-3.4.1.min.js"></script>
+    <!-- popper.min.js 用于弹窗、提示、下拉菜单 -->
+    <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+    <!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+    <script src="../static/js/bootstrap.min.js"></script>
+    <!-- 背景动画 -->
+    <canvas id="c_n9" width="1920" height="990" style="position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 0.5;"></canvas>
+    <script src="https://files.cnblogs.com/files/jingmoxukong/canvas-nest.min.js"></script>
+    <style>
+        body{
+            background-image: url(../static/img/mainpage_bg.png)
+        }
+        
+        .box{
+            position:fixed;
+            right:15px;
+            bottom: 20px;
+            height:50px;
+            width: 50px;    
+            text-align:center;
+            padding-top:20px;    
+            background-color: lightblue;
+            border-radius: 20%;
+            overflow: hidden;
+        }
+        /* .box:hover:before{
+            top:50%
+        } */
+        .box:hover{
+            /* visibility: hidden; */
+            cursor:pointer;
+        }
+        /* .box:before{
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            content:'回到顶部';
+            width: 40px;
+            color:peru;
+            font-weight:bold;
+        }     */
+        .box-in{
+            visibility: visible;
+            display:inline-block;
+            height:20px;
+            width: 20px;
+            border: 3px solid black;
+            border-color: white transparent transparent white;
+            transform:rotate(45deg);
+        }
+
+    </style>
+</head> 
+
+<body>
+    <div class="container" name="top">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class="row clearfix">
+                    <div class="col-md-2 column">
+                    </div>
+                    <div class="col-md-8 column">
+                        <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+                            <a class="navbar-brand" href="#">
+                                <img src="../static/img/white-title.png" alt="logo" style="width:130px;">
+                            </a>
+                            <ul class="navbar-nav">
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="#"><strong>帖子</strong></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/post_new"><strong>发布</strong></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/user_info"><strong>个人信息</strong></a>
+                                </li>
+                            </ul>
+                            <!-- 导航栏居右的写法 justify-content-end -->
+                            <div class="collapse navbar-collapse justify-content-end">
+                                <ul class="navbar-nav">
+                                    <form class="form-inline" action="/search/1" method="POST" id="searchForm">
+                                        <input class="form-control" type="text" id="searchValue" name="searchValue"
+                                            placeholder="搜索...">
+                                        <button class="btn btn-primary" type="submit" id="searchBtn"
+                                            onclick="search();">Search</button>
+                                    </form>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/logout"><strong>退 出</strong></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                        <br><br><br><br>
+                        <h1>Hello {{ userName }}!</h1>
+                        <hr />
+                        {% for item in posts %}
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h4>title：{{ item.title }}</h4>
+                            </div>
+                            <div class="card-body bg-light text-dark">
+                                <li>category：{{ item.category }}</li>
+                                <li>added_time：{{ item.added_time }}</li>
+                                <li>user_id：{{ item.user_id }}</li>
+                            </div>
+                            <div class="card-footer bg-secondary text-white">
+                                <form>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">留言：</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="写下你想说的..">
+                                    </div>
+                                    <button type="button">
+                                        <span>submit</span>
+                                    </button>
+                                </form>
+                            </div>
+                            <br>
+                            <hr />
+                            {% endfor %}
+
+                            {%import 'pages.html' as pg%}
+                            {{pg.my_paginate(pagination,'main')}}
+                        </div>
+                    </div>
+                    <div class="col-md-2 column">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 模态框 -->
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 class="modal-title">提 示</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <p id="alerttext">检索内容不能为空...</p>
+                </div>
+                <!-- 模态框底部 -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="box" class="box">
+        <div class="box-in"></div>
+    </div> 
+    <script type="text/javascript">
+
+        var timer  = null;
+        box.onclick = function(){
+            cancelAnimationFrame(timer);
+            //获取当前毫秒数
+            var startTime = +new Date();     
+            //获取当前页面的滚动高度
+            var b = document.body.scrollTop || document.documentElement.scrollTop;
+            var d = 700;
+            var c = b;
+            timer = requestAnimationFrame(function func(){
+                var t = d - Math.max(0,startTime - (+ new Date()) + d);
+                document.documentElement.scrollTop = document.body.scrollTop = t * (-c) / d + b;
+                timer = requestAnimationFrame(func);
+                if(t == d){
+                cancelAnimationFrame(timer);
+                }
+            });
+        }
+        function search() {
+            let searchValue = document.getElementById("searchValue").value;
+            console.log(searchValue);
+            if (searchValue == "") {
+                document.getElementById("alerttext").innerText = "检索内容不能为空..."
+                $("#myModal").modal();
+            } else {
+                $("#searchForm").submit();
+                // $.ajax({
+                //     type: 'POST',
+                //     url: "/search/1",
+                //     data: {
+                //         searchValue: searchValue,
+                //     },
+                //     cache: false,
+                //     error: function (err) {
+                //         document.getElementById("alerttext").innerText = "无法连接到服务器，请稍后再试..."
+                //         $("#myModal").modal();
+                //     },
+                //     success: function (data) {
+                //         if (data == "Query null") {
+                //             document.getElementById("alerttext").innerText = "没有找到相关检索内容..."
+                //             $("#myModal").modal();
+                //         } else {
+                //             document.getElementById("alerttext").innerText = "检索中..."
+                //             $("#myModal").modal();
+                //             setTimeout(function () {
+                //                 $("#ajaxUpdate").html(data);
+                //             }, 2000);
+                //         }
+                //     }
+                // });
+            }
+        }
+    </script>
+</body>
+
+</html>
